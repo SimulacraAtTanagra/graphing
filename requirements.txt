@@ -1,0 +1,6 @@
+nltk==3.4
+numpy==1.15.1
+matplotlib==3.0.2
+funcy==1.15
+labMTsimple==2.8.7
+PyPDF2==1.26.0
