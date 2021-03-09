@@ -25,26 +25,17 @@ def wordshifter(i):
     iStoppedVec = stopper(iFvec,labMTvector,labMTwordList,stopVal=1.0)
     return(emotionV(iStoppedVec,labMTvector))
 def splitscrape(text):
-    sent_corpus = []
-    for s in nltk.sent_tokenize(text):
-        sent_corpus.append(s)
+    sent_corpus = [s for s in nltk.sent_tokenize(text)]
     sent_corpus= ["".join(chunk) for chunk in chunks(int(len(sent_corpus)/100),sent_corpus)]
-    plotlist=[]
-    for x in sent_corpus:
-        plotlist.append(wordshifter(x))
+    plotlist=[wordshifter(x) for x in sent_corpus]
     return(plotlist)
 def scriptscrape(filename):
-    pdfFileObj = open(filename, 'rb')
-    pdfReader = PyPDF2.PdfFileReader(pdfFileObj) 
-    plotlist=[]
-    for i in range(pdfReader.numPages):
-        pageObj = pdfReader.getPage(i) 
-        x = pageObj.extractText()
-        x= re.sub('\d+\s\d+\S\d+\S\d+,\d+\s\S+\s\d+\S\d+\S\d+,\d+','\n',x)
-        x= re.sub('<\S+\s+\S+>','\n',x)
-        #for row in x.split('\n'):
-        #    plotlist.append(wordshifter(row))
-        plotlist.append(wordshifter(x))
+    with open(filename, 'rb') as pdfFileObj:
+        pdfReader = PyPDF2.PdfFileReader(pdfFileObj) 
+    plotlist=[pdfReader.getPage(i).extractText() for i in range(pdfReader.numPages)]
+    plotlist=[re.sub('\d+\s\d+\S\d+\S\d+,\d+\s\S+\s\d+\S\d+\S\d+,\d+','\n',x) for x in plotlist]
+    plotlist=[re.sub('<\S+\s+\S+>','\n',x) for x in plotlist]
+    plotlist=[wordshifter(x) for x in plotlist]
     return(plotlist)
 def flatlist(plotlist):
     flat_list = [item for sublist in plotlist for item in sublist]
@@ -53,7 +44,7 @@ def consolidate(fn):
     plist=[]
     x=os.getcwd()
     if x[-11:]!='transcripts':
-        directory_in_str= f'{x}\\transcripts\\'
+        directory_in_str= os.path.join(x,'transcripts')
     else:
         directory_in_str = x
     directory = os.fsencode(directory_in_str)           #defines directory as indicated string
